@@ -18,7 +18,7 @@ screen.fill(background_color)
 title_font = pygame.font.Font(None, 64)
 
 # Create the title text
-title_text = title_font.render("Snake Game", True, (255, 255, 255))  # White
+title_text = title_font.render("GAME OVER!", True, (255, 255, 255))  # White
 
 # Calculate the position of the title text
 title_x = (screen_width - title_text.get_width()) // 2
@@ -31,7 +31,7 @@ screen.blit(title_text, (title_x, title_y))
 button_font = pygame.font.Font(None, 32)
 
 # Create the buttons
-button1_text = button_font.render("Start Game", True, (0, 0, 0))  # Black
+button1_text = button_font.render("Home screen", True, (0, 0, 0))  # Black
 button2_text = button_font.render("Quit", True, (0, 0, 0))  # Black
 
 # Create button surfaces
@@ -60,6 +60,7 @@ screen.blit(button2_surface, (button2_x, button2_y))
 pygame.display.flip()
 
 # Game loop
+# Game loop
 running = True
 while running:
     for event in pygame.event.get():
@@ -72,13 +73,8 @@ while running:
             # Check if the "Start Game" button was clicked
             if button1_x <= mouse_x <= button1_x + button1_surface.get_width() and button1_y <= mouse_y <= button1_y + button1_surface.get_height():
                 # Run the game.py file
-                subprocess.Popen(["python", "game.py"])
+                subprocess.Popen(["python", "snake.py"])
                 running = False
-
-            # Check if the "Quit" button was clicked
-            if button2_x <= mouse_x <= button2_x + button2_surface.get_width() and button2_y <= mouse_y <= button2_y + button2_surface.get_height():
-                pygame.quit()
-                sys.exit()
 
     # Update the display
     pygame.display.flip()
