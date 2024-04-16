@@ -3,6 +3,7 @@ import pygame
 import time
 import random
 import subprocess
+import sys
 
 snake_speed = 10
 
@@ -15,7 +16,6 @@ black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
 red = pygame.Color(255, 0, 0)
 green = pygame.Color(124, 252, 0)
-blue = pygame.Color(0, 0, 255)
 
 # Initialising pygame
 pygame.init()
@@ -36,54 +36,79 @@ snake_segments = [[100, 50],
 			[80, 50],
 			[70, 50]
 			]
-# fruit position
+#define fruit spawning positions using random
 fruit_location = [random.randrange(1, (screen_width//10)) * 10, 
 				random.randrange(1, (screen_height//10)) * 10]
 
 fruit_spawn = True
 
-# setting default snake direction towards
-# right
+#setting the direction for the snake to start off in
 direction = 'RIGHT'
 change_to = direction
 
-# initial score
+#setting base score
 current_score = 0
 
 # displaying Score function
 def display_score(choice, color, font, size):
-
-	# creating font object score_font
 	score_font = pygame.font.SysFont(font, size)
-	
-	# create the display surface object 
-	# score_surface
 	score_surface = score_font.render('Score : ' + str(current_score), True, color)
-	
-	# create a rectangular object for the text
-	# surface object
 	score_rect = score_surface.get_rect()
-	
-	# displaying text
 	game_window.blit(score_surface, score_rect)
+
+def pause_game():
+	paused = True
+	button_font = pygame.font.SysFont(None, 50)
+	paused_font = pygame.font.SysFont(None, 70)  # Font for "Paused" text
+	screen_width, screen_height = game_window.get_size()  # Get the size of the game window
+	fps = pygame.time.Clock()  # Create a clock object for FPS control
+
+	while paused:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				quit()
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				mouse_pos = pygame.mouse.get_pos()
+				if resume_button.collidepoint(mouse_pos):
+					paused = False
+				elif restart_button.collidepoint(mouse_pos):
+					pygame.quit()
+					subprocess.call([sys.executable, "game.py"])  # Restart the game
+				elif quit_button.collidepoint(mouse_pos):
+					pygame.quit()
+					quit()
+
+		game_window.fill((0, 0, 0))  # Fill the screen with black
+
+		# Display "Paused" at the top center of the screen
+		paused_text = paused_font.render('Paused', True, (255, 255, 255))  # White text
+		game_window.blit(paused_text, ((screen_width - paused_font.size('Paused')[0]) / 2, 20))
+
+		# Define buttons
+		button_width, button_height = 200, 50
+		button_spacing = 20  # Space between buttons
+		button_y_start = (screen_height - 3 * button_height - 2 * button_spacing) / 2  # Start drawing buttons from this y-coordinate
+		resume_button = pygame.draw.rect(game_window, (255, 255, 255), ((screen_width - button_width) / 2, button_y_start, button_width, button_height))  # White button
+		restart_button = pygame.draw.rect(game_window, (255, 255, 255), ((screen_width - button_width) / 2, button_y_start + button_height + button_spacing, button_width, button_height))  # White button
+		quit_button = pygame.draw.rect(game_window, (255, 255, 255), ((screen_width - button_width) / 2, button_y_start + 2 * (button_height + button_spacing), button_width, button_height))  # White button
+
+		# Add text to buttons
+		game_window.blit(button_font.render('Resume', True, (0, 0, 0)), ((screen_width - button_font.size('Resume')[0]) / 2, button_y_start + 10))  # Black text
+		game_window.blit(button_font.render('Restart', True, (0, 0, 0)), ((screen_width - button_font.size('Restart')[0]) / 2, button_y_start + button_height + button_spacing + 10))  # Black text
+		game_window.blit(button_font.render('Quit', True, (0, 0, 0)), ((screen_width - button_font.size('Quit')[0]) / 2, button_y_start + 2 * (button_height + button_spacing) + 10))  # Black text
+
+		pygame.display.update()
+		fps.tick(5)  # Limit the frame rate to 5 FPS
 
 # game over function
 def game_over():
-    # After 2 seconds we will quit the program
     time.sleep(2)
-
-    # Deactivating pygame library
     pygame.quit()
-
-    # Run the gameover.py file
     subprocess.Popen(["python", "gameover.py"])
-
-    # Quit the program
     quit()
 
-# Main Function
 while True:
-	
 	# handling key events
 	for event in pygame.event.get():
 		if event.type == pygame.KEYDOWN:
@@ -95,10 +120,9 @@ while True:
 				change_to = 'LEFT'
 			if event.key == pygame.K_RIGHT:
 				change_to = 'RIGHT'
-
-	# If two keys pressed simultaneously
-	# we don't want snake to move into two 
-	# directions simultaneously
+			if event.key == pygame.K_ESCAPE:
+				pause_game()
+#snake movement
 	if change_to == 'UP' and direction != 'DOWN':
 		direction = 'UP'
 	if change_to == 'DOWN' and direction != 'UP':
@@ -108,7 +132,6 @@ while True:
 	if change_to == 'RIGHT' and direction != 'LEFT':
 		direction = 'RIGHT'
 
-	# Moving the snake
 	if direction == 'UP':
 		snake_position[1] -= 10
 	if direction == 'DOWN':
@@ -118,9 +141,6 @@ while True:
 	if direction == 'RIGHT':
 		snake_position[0] += 10
 
-	# Snake body growing mechanism
-	# if fruits and snakes collide then scores
-	# will be incremented by 10
 	snake_segments.insert(0, list(snake_position))
 	if snake_position[0] == fruit_location[0] and snake_position[1] == fruit_location[1]:
 		current_score += 10
@@ -147,12 +167,11 @@ while True:
 	if snake_position[1] < 0 or snake_position[1] > screen_height-10:
 		game_over()
 
-	# Touching the snake body
 	for block in snake_segments[1:]:
 		if snake_position[0] == block[0] and snake_position[1] == block[1]:
 			game_over()
 
-	# displaying score continuously
+#updates the score 
 	display_score(1, white, 'times new roman', 20)
 	
 	# Refresh game screen

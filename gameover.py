@@ -76,6 +76,10 @@ while running:
                 subprocess.Popen(["python", "snake.py"])
                 running = False
 
+            if button2_x <= mouse_x <= button2_x + button2_surface.get_width() and button2_y <= mouse_y <= button2_y + button2_surface.get_height():
+                pygame.quit()
+                sys.exit()
+
     # Update the display
     pygame.display.flip()
 
