@@ -145,6 +145,7 @@ while True:
 	if snake_position[0] == fruit_location[0] and snake_position[1] == fruit_location[1]:
 		current_score += 10
 		fruit_spawn = False
+		snake_speed += 1
 	else:
 		snake_segments.pop()
 		
