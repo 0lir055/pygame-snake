@@ -5,8 +5,6 @@ import random
 import subprocess
 import sys
 
-snake_speed = 10
-
 # Window size
 screen_width = 800
 screen_height = 600
@@ -31,11 +29,13 @@ fps = pygame.time.Clock()
 snake_position = [100, 50]
 
 # defining first 4 blocks of snake body
-snake_segments = [[100, 50],
-			[90, 50],
-			[80, 50],
-			[70, 50]
-			]
+snake_segments = [[200, 100],
+				  [190, 100],
+				  [180, 100],
+				  [170, 100],
+				  [160, 100],
+				  [150, 100]]
+
 #define fruit spawning positions using random
 fruit_location = [random.randrange(1, (screen_width//10)) * 10, 
 				random.randrange(1, (screen_height//10)) * 10]
@@ -49,12 +49,12 @@ change_to = direction
 #setting base score
 current_score = 0
 
-# displaying Score function
-def display_score(choice, color, font, size):
-	score_font = pygame.font.SysFont(font, size)
-	score_surface = score_font.render('Score : ' + str(current_score), True, color)
-	score_rect = score_surface.get_rect()
-	game_window.blit(score_surface, score_rect)
+# game over function
+def game_over():
+	time.sleep(2)
+	pygame.quit()
+	subprocess.Popen(["python", "gameover.py"])
+	quit()
 
 def pause_game():
 	paused = True
@@ -101,12 +101,12 @@ def pause_game():
 		pygame.display.update()
 		fps.tick(5)  # Limit the frame rate to 5 FPS
 
-# game over function
-def game_over():
-    time.sleep(2)
-    pygame.quit()
-    subprocess.Popen(["python", "gameover.py"])
-    quit()
+# displaying Score function
+def display_score(choice, color, font, size):
+	score_font = pygame.font.SysFont(font, size)
+	score_surface = score_font.render('Score : ' + str(current_score), True, color)
+	score_rect = score_surface.get_rect()
+	game_window.blit(score_surface, score_rect)
 
 while True:
 	# handling key events
@@ -122,7 +122,7 @@ while True:
 				change_to = 'RIGHT'
 			if event.key == pygame.K_ESCAPE:
 				pause_game()
-#snake movement
+	#snake movement
 	if change_to == 'UP' and direction != 'DOWN':
 		direction = 'UP'
 	if change_to == 'DOWN' and direction != 'UP':
@@ -171,11 +171,13 @@ while True:
 		if snake_position[0] == block[0] and snake_position[1] == block[1]:
 			game_over()
 
-#updates the score 
-	display_score(1, white, 'times new roman', 20)
+	#updates the score 
+	display_score(1, black, 'sans serif', 20)
 	
 	# Refresh game screen
 	pygame.display.update()
+
+	snake_speed = 10
 
 	# Frame Per Second /Refresh Rate
 	fps.tick(snake_speed)
